@@ -1,0 +1,36 @@
+:host {
+    display: inline-block;
+    position: relative;
+}
+
+.leaf-card {
+    margin: 5px;
+    display: inline-block;
+    transition: background-color .1s ease;
+    cursor: pointer;
+    user-select: none;
+
+    &_hovered {
+        background-color: red;
+    }
+
+    &_parent-hovered {
+        background-color: yellow;
+    }
+}
+
+.children {
+    display: flex;
+    flex-direction: column;
+    padding-left: 15px;
+}
+
+.connector {
+    position: absolute;
+    top: 0;
+    transition: color .1s ease;
+
+    &_highlighted {
+        color: red;
+    }
+}

@@ -1,0 +1,22 @@
+<button
+    class="close-button"
+    mat-icon-button
+    aria-label="Закрыть панель"
+    (click)="cancelLeafSetup()">
+    <mat-icon>close</mat-icon>
+</button>
+
+<leaf-type-option [parentFormGroup]="formGroup">
+</leaf-type-option>
+
+<filter-type-option
+    *ngIf="isFilterTypeOptionShown$ | async"
+    [filters]="filters"
+    [parentFormGroup]="formGroup">
+</filter-type-option>
+
+<filter-value-option
+    *ngIf="isFilterValueOptionShown$ | async"
+    [selectedFilter]="selectedFilter$ | async"
+    [filters]="filters">
+</filter-value-option>

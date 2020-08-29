@@ -1,0 +1,17 @@
+<h4 class="heading">
+    Выберите фильтр:
+</h4>
+
+<ng-container [formGroup]="parentFormGroup">
+    <mat-form-field appearance="fill">
+        <mat-label>Фильтр</mat-label>
+        <mat-select [formControlName]="controlNames.selectedFilter">
+            <mat-option
+                *ngFor="let filter of filters"
+                [value]="filter">
+                {{ filter.name }}
+            </mat-option>
+        </mat-select>
+    </mat-form-field>
+</ng-container>
+

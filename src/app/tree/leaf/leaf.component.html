@@ -1,0 +1,53 @@
+<mat-card
+    class="leaf-card"
+    [class.leaf-card_parent-hovered]="isParentHovered"
+    [class.leaf-card_hovered]="isHovered"
+    #matCardRef
+    (mouseenter)="onMatCardMouseEnter()"
+    (mouseleave)="onMatCardMouseLeave()"
+    (click)="onMatCardClick(leaf)">
+    {{ leaf.value }}
+</mat-card>
+<div
+    class="children"
+    *ngIf="!!leaf.children"
+    #childrenRef>
+
+    <leaf
+        [leaf]="leaf.firstChild"
+        [isParentHovered]="isHovered"
+        #firstChildLeafRef>
+    </leaf>
+    <leaf
+        [leaf]="leaf.secondChild"
+        [isParentHovered]="isHovered"
+        #secondChildLeafRef>
+    </leaf>
+
+    <ng-container *ngIf="areConnectorsVisible">
+        <svg
+            class="connector"
+            [class.connector_highlighted]="isHovered"
+            [style.left.px]="firstConnector.left"
+            [attr.width]="firstConnector.width"
+            [attr.height]="firstConnector.height"
+            xmlns="http://www.w3.org/2000/svg">
+            <path
+                [attr.d]="firstConnector.path"
+                stroke="currentColor"
+                fill="transparent"/>
+        </svg>
+        <svg
+            class="connector"
+            [class.connector_highlighted]="isHovered"
+            [style.left.px]="secondConnector.left"
+            [attr.width]="secondConnector.width"
+            [attr.height]="secondConnector.height"
+            xmlns="http://www.w3.org/2000/svg">
+            <path
+                [attr.d]="secondConnector.path"
+                stroke="currentColor"
+                fill="transparent"/>
+        </svg>
+    </ng-container>
+</div>

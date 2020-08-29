@@ -1,0 +1,66 @@
+<h4 class="heading">
+    Настройте фильтр:
+</h4>
+
+<ng-container [formGroup]="formGroup">
+    <ng-container [ngSwitch]="selectedFilter.filterRepresentation">
+        <ng-container *ngSwitchCase="FilterRepresentation.CHECKBOX">
+            <mat-checkbox [formControlName]="controlNames.input">{{ selectedFilter.name }}</mat-checkbox>
+        </ng-container>
+
+        <ng-container *ngSwitchCase="FilterRepresentation.RADIO_GROUP">
+            <mat-radio-group
+                aria-label="Выберите один из вариантов"
+                class="radio-group"
+                [formControlName]="controlNames.input">
+                <mat-radio-button
+                    *ngFor="let option of selectedFilter.parameterValues[0]"
+                    [value]="option"
+                    class="radio-button">
+                    {{ option }}
+                </mat-radio-button>
+            </mat-radio-group>
+        </ng-container>
+
+        <ng-container *ngSwitchCase="FilterRepresentation.INPUT_WITH_OPERATOR">
+            <ng-container *ngTemplateOutlet="operatorTemplate"></ng-container>
+
+            <mat-form-field appearance="fill">
+                <mat-label>{{ selectedFilter.name }}</mat-label>
+                <input matInput [formControlName]="controlNames.input">
+            </mat-form-field>
+        </ng-container>
+
+        <ng-container *ngSwitchCase="FilterRepresentation.AUTOCOMPLETE_WITH_OPERATOR">
+            <ng-container *ngTemplateOutlet="operatorTemplate"></ng-container>
+            <mat-form-field appearance="fill">
+                <mat-label>{{ selectedFilter.name }}</mat-label>
+                <input
+                    type="text"
+                    matInput
+                    [formControlName]="controlNames.input"
+                    [matAutocomplete]="auto">
+            </mat-form-field>
+
+            <mat-autocomplete #auto="matAutocomplete">
+                <mat-option
+                    *ngFor="let autocompleteOption of selectedFilter.parameterValues[0]"
+                    [value]="autocompleteOption">
+                    {{ autocompleteOption }}
+                </mat-option>
+            </mat-autocomplete>
+        </ng-container>
+
+        <ng-template #operatorTemplate>
+            <mat-form-field appearance="fill" class="operator">
+                <mat-label>Условие</mat-label>
+                <mat-select [formControlName]="controlNames.operator">
+                    <mat-option *ngFor="let operator of selectedFilter.operators" [value]="operator">
+                        {{ operator | operatorPipe  }}
+                    </mat-option>
+                </mat-select>
+            </mat-form-field>
+        </ng-template>
+    </ng-container>
+</ng-container>
+
