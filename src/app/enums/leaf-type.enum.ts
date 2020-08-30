@@ -1,4 +1,5 @@
 export enum LeafType {
     EXPRESSION,
-    FILTER
+    FILTER,
+    NONE
 };

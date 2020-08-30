@@ -9,6 +9,7 @@ import { MatSelectModule } from '@angular/material/select';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatInputModule } from '@angular/material/input';
 import { MatAutocompleteModule } from '@angular/material/autocomplete';
+import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 
 import { LeafOptionsComponent } from './leaf-options.component';
 import { LeafTypeOptionComponent } from './leaf-type-option/leaf-type-option.component';
@@ -26,7 +27,8 @@ import { OperatorPipe } from 'app/shared/pipes/operator.pipe';
         MatSelectModule,
         MatCheckboxModule,
         MatInputModule,
-        MatAutocompleteModule
+        MatAutocompleteModule,
+        MatSlideToggleModule
     ],
     providers: [],
     declarations: [

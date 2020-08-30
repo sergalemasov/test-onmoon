@@ -1,13 +1,13 @@
 import { Injectable } from '@angular/core';
 import { Leaf } from 'app/interfaces';
 import { DrawerService } from 'app/shared/drawer/drawer.service';
-import { BehaviorSubject, Observable } from 'rxjs';
+import { Observable, Subject } from 'rxjs';
 
 @Injectable()
 export class LeafOptionsService {
     leaf$: Observable<Leaf>;
 
-    private leafSource$ = new BehaviorSubject<Leaf>(null);
+    private leafSource$ = new Subject<Leaf>();
 
     constructor(private drawerService: DrawerService) {
         this.leaf$ = this.leafSource$.asObservable();
@@ -19,11 +19,9 @@ export class LeafOptionsService {
         this.leafSource$.next(leaf);
     }
 
-    saveLeaf() {
-        this.drawerService.hide();
-    }
-
     cancelLeafSetup() {
+        this.leafSource$.next(null);
+
         this.drawerService.hide();
     }
 }

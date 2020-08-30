@@ -10,6 +10,9 @@ import {
 import { Leaf, Connector } from 'app/interfaces';
 import { WindowService } from 'app/services/window/window.service';
 import { LeafOptionsService } from 'app/services/leaf-options/leaf-options.service';
+import { FilterRepresentation } from 'app/enums/filter-representation.enum';
+import { Observable } from 'rxjs';
+import { map } from 'rxjs/operators';
 
 @Component({
     selector: 'leaf',
@@ -18,7 +21,17 @@ import { LeafOptionsService } from 'app/services/leaf-options/leaf-options.servi
     changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class LeafComponent implements AfterViewInit {
-    @Input() leaf: Leaf;
+    @Input('leaf')
+    set leafSetter(leaf: Leaf) {
+        this.leaf = leaf;
+        this.matCardText = this.getMatCardText();
+
+        if (this.isViewInitialized) {
+            setTimeout(() => this.calculateConnectorProps());
+        }
+    }
+    @Input() isRoot: boolean;
+
     @Input() isParentHovered: boolean;
 
     @ViewChild('matCardRef', {static: false, read: ElementRef})
@@ -37,8 +50,19 @@ export class LeafComponent implements AfterViewInit {
     secondConnector: Connector;
     areConnectorsVisible = false;
     isHovered = false;
+    FilterRepresentation = FilterRepresentation;
+    leaf: Leaf;
+    matCardText: string;
+    isSelected$: Observable<boolean>;
 
     private window: Window;
+    private operatorMap = {
+        '=': '',
+        '!=': 'не',
+        '>': 'больше',
+        '<': 'меньше'
+    };
+    private isViewInitialized = false;
 
     constructor(windowService: WindowService,
                 private changeDetectorRef: ChangeDetectorRef,
@@ -47,8 +71,15 @@ export class LeafComponent implements AfterViewInit {
         this.window = windowService.getNativeWindow();
     }
 
+    ngOnInit() {
+        this.initTemplateObservables();
+    }
+
     ngAfterViewInit() {
-        setTimeout(() => this.calculateConnectorProps());
+        setTimeout(() => {
+            this.calculateConnectorProps();
+            this.isViewInitialized = true;
+        });
     }
 
     onMatCardMouseEnter() {
@@ -63,8 +94,41 @@ export class LeafComponent implements AfterViewInit {
         this.leafOptionsService.openLeafOptions(leaf);
     }
 
+    private initTemplateObservables() {
+        this.isSelected$ = this.leafOptionsService.leaf$
+            .pipe(map(leaf => leaf && leaf.id === this.leaf.id));
+    }
+
+    private getMatCardText(): string {
+        switch (this.leaf.filterRepresentation) {
+            case FilterRepresentation.NONE:
+                return this.leaf.name;
+
+            case FilterRepresentation.CHECKBOX:
+                return `${this.leaf.value ? '' : 'Не '}${this.leaf.name}`;
+
+            case FilterRepresentation.RADIO_GROUP:
+                return `${this.leaf.name}: ${this.leaf.not ? 'не ' : ''}${this.leaf.value || ''}`;
+
+            case FilterRepresentation.INPUT_WITH_OPERATOR:
+            case FilterRepresentation.AUTOCOMPLETE_WITH_OPERATOR:
+                let operatorRepresentation = this.operatorMap[this.leaf.operator];
+                let not = this.leaf.not;
+
+                if (this.leaf.operator === '!=' && not) {
+                    operatorRepresentation = '';
+                    not = false;
+                }
+
+                return `${this.leaf.name}: `
+                    + `${not ? 'не ' : ''}`
+                    + `${operatorRepresentation ? operatorRepresentation + ' ' : ''}`
+                    + `${this.leaf.value || ''}`;
+        }
+    }
+
     private calculateConnectorProps() {
-        if (!this.leaf.firstChild) {
+        if (!this.leaf.hasChildren) {
             return;
         }
 
@@ -105,7 +169,7 @@ export class LeafComponent implements AfterViewInit {
         let firstConnectorTop: number;
         let secondConnectorTop: number;
 
-        if (!this.leaf.parent) {
+        if (this.isRoot) {
             firstConnectorTop = matCardOffsetTop + Math.floor(matCardHeight / 2) + connectorsBetweenOffset;
             secondConnectorTop = matCardOffsetTop + Math.floor(matCardHeight / 2) - connectorsBetweenOffset;
         } else {
@@ -119,7 +183,7 @@ export class LeafComponent implements AfterViewInit {
             + matCardOffsetTop
             + Math.floor(matCardHeight / 2);
 
-        if (this.leaf.firstChild.firstChild) {
+        if (this.leaf.firstChild.hasChildren) {
             firstConnectorVerticalPathHeight -= connectorsBetweenOffset * 2;
         }
 
@@ -129,7 +193,7 @@ export class LeafComponent implements AfterViewInit {
             + matCardOffsetTop
             + Math.floor(matCardHeight / 2);
 
-        if (this.leaf.secondChild.firstChild) {
+        if (this.leaf.secondChild.hasChildren) {
             secondConnectorVerticalPathHeight -= connectorsBetweenOffset * 2;
         }
 

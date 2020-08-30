@@ -10,12 +10,13 @@
     cursor: pointer;
     user-select: none;
 
-    &_hovered {
-        background-color: red;
+    &_hovered,
+    &_selected {
+        background-color: #ffee58;
     }
 
     &_parent-hovered {
-        background-color: yellow;
+        background-color: #ffff8b;
     }
 }
 
@@ -31,6 +32,6 @@
     transition: color .1s ease;
 
     &_highlighted {
-        color: red;
+        color: #b14f19;
     }
 }

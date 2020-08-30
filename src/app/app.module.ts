@@ -13,6 +13,7 @@ import { DrawerModule } from './shared/drawer/drawer.module';
 import { IdGeneratorService } from './services/id-generator/id-generator.service';
 import { TreeService } from './services/tree/tree.service';
 import { FilterConverter } from './converters/filter.converter';
+import { TreeConverter } from './converters/tree.converter';
 
 @NgModule({
   declarations: [
@@ -32,7 +33,8 @@ import { FilterConverter } from './converters/filter.converter';
     LeafOptionsService,
     IdGeneratorService,
     TreeService,
-    FilterConverter
+    FilterConverter,
+    TreeConverter
   ],
   bootstrap: [AppComponent]
 })

@@ -16,7 +16,6 @@ export class FiltersService {
             .pipe(
                 map(({filters}: {filters: FilterDto[]}) => filters.map(filter => this.filterConverter.fromDto(filter))),
                 tap(filters => this.filters = filters),
-                tap(filters => console.log(filters)),
                 mapTo(true),
                 catchError(error => {
                     console.error(error);

@@ -2,15 +2,17 @@
     class="leaf-card"
     [class.leaf-card_parent-hovered]="isParentHovered"
     [class.leaf-card_hovered]="isHovered"
+    [class.leaf-card_selected]="isSelected$ | async"
     #matCardRef
     (mouseenter)="onMatCardMouseEnter()"
     (mouseleave)="onMatCardMouseLeave()"
     (click)="onMatCardClick(leaf)">
-    {{ leaf.value }}
+    {{ matCardText }}
 </mat-card>
+
 <div
     class="children"
-    *ngIf="!!leaf.children"
+    *ngIf="leaf.hasChildren"
     #childrenRef>
 
     <leaf

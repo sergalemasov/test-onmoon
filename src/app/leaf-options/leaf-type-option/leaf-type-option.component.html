@@ -1,16 +1,14 @@
 <h4 class="heading">
     Выберите тип:
 </h4>
-<ng-container
-    [formGroup]="parentFormGroup">
-    <mat-radio-group
-        aria-label="Выберите тип"
-        class="radio-group"
-        [formControlName]="controlNames.leafType">
-        <mat-radio-button
-            *ngFor="let option of options"
-            [value]="option.value">
-            {{ option.name }}
-        </mat-radio-button>
-    </mat-radio-group>
-</ng-container>
+<mat-radio-group
+    aria-label="Выберите тип"
+    class="radio-group"
+    [formControl]="formControl">
+    <mat-radio-button
+        *ngFor="let option of options"
+        [value]="option.value">
+        {{ option.name }}
+    </mat-radio-button>
+</mat-radio-group>
+

@@ -7,6 +7,16 @@ import { FilterRepresentation } from 'app/enums/filter-representation.enum';
 
 @Injectable()
 export class TreeService {
+    private static leafDefaults = {
+        name: 'Настроить фильтр',
+        type: LeafType.NONE,
+        filterRepresentation: FilterRepresentation.NONE,
+        hasChildren: false,
+        not: false,
+        firstChild: undefined,
+        secondChild: undefined
+    };
+
     tree$: Observable<Leaf>;
 
     private treeSource$ = new BehaviorSubject<Leaf>(this.createNewLeaf());
@@ -15,80 +25,123 @@ export class TreeService {
         this.tree$ = this.treeSource$.asObservable();
     }
 
-    addChildLeafs(leafId: string) {
-        const leaf = this.findLeaf(leafId);
+    getTree() {
+        return this.treeSource$.getValue();
+    }
 
-        this.updateLeaf(
-            leaf,
+    updateAndAddLeafs(leafId: string, patch: Partial<Leaf>) {
+        const branch = this.findLeafBranch(leafId);
+
+        const childrenPatch = branch[branch.length - 1].hasChildren
+            ? {}
+            : {
+                hasChildren: true,
+                firstChild: this.createNewLeaf(),
+                secondChild: this.createNewLeaf()
+            };
+
+        this.updateBranch(
+            branch,
             {
-                firstChild: this.createNewLeaf(leaf),
-                secondChild: this.createNewLeaf(leaf)
+                ...childrenPatch,
+                ...patch
             }
         );
     }
 
-    removeChildLeafs(leafId: string) {
-        const leaf = this.findLeaf(leafId);
+    updateAndRestoreLeafs(leafId: string, firstChild: Leaf, secondChild: Leaf, patch: Partial<Leaf>) {
+        const branch = this.findLeafBranch(leafId);
 
-        this.updateLeaf(
-            leaf,
+        const childrenPatch = branch[branch.length - 1].hasChildren
+            ? {}
+            : {
+                hasChildren: true,
+                firstChild,
+                secondChild
+            };
+
+        this.updateBranch(
+            branch,
             {
-                firstChild: undefined,
-                secondChild: undefined
+                ...childrenPatch,
+                ...patch
             }
         );
     }
 
-    updateLeaf(leaf: Leaf, patch: Partial<Leaf>) {
-        const parent = leaf.parent;
+    updateLeafById(leafId: string, patch: Partial<Leaf>) {
+        const branch = this.findLeafBranch(leafId);
 
-        if (!parent) {
+        this.updateBranch(branch, patch);
+    }
+
+    restoreDefaults(leafId: string) {
+        const branch = this.findLeafBranch(leafId);
+
+        this.updateBranch(branch, TreeService.leafDefaults);
+    }
+
+    private updateBranch(branch: Leaf[], patch: Partial<Leaf>) {
+        if (branch.length < 2) {
             this.treeSource$.next({
-                ...leaf,
+                ...branch[0],
                 ...patch
             });
 
             return;
         }
 
-        if (parent.firstChild === leaf) {
-            parent.firstChild = {
-                ...leaf,
-                ...patch
-            };
-        } else {
-            parent.secondChild = {
-                ...leaf,
-                ...patch
-            };
+        for (let i = branch.length - 2; i >=0; i--) {
+            const childToUpdate = branch[i].firstChild === branch[i + 1]
+                ? 'firstChild'
+                : 'secondChild';
+
+            branch[i][childToUpdate] = {
+                ...branch[i + 1],
+            }
+
+            if (i === branch.length - 2) {
+                Object.assign(branch[i][childToUpdate], patch);
+            }
         }
 
-        this.treeSource$.next(this.treeSource$.getValue());
+        this.treeSource$.next({...branch[0]});
     }
 
-    private createNewLeaf(parent?: Leaf): Leaf {
-        return {
-            value: 'Настроить фильтр',
-            type: LeafType.FILTER,
+    private createNewLeaf(): Leaf {
+        const newLeaf = {
             id: this.idGeneratorService.generate(),
-            filterRepresentation: FilterRepresentation.NONE,
-            parent
+            ...TreeService.leafDefaults
         };
+
+        return newLeaf;
     }
 
-    private findLeaf(leafId: string) {
-        const finder = (currentLeaf: Leaf) => {
+    private findLeafBranch(leafId: string) {
+        const branch = [];
+
+        const addLeafToBranch = (currentLeaf: Leaf) => {
             if (!currentLeaf) {
-                return null;
+                return false;
             }
 
             if (currentLeaf.id === leafId) {
-                return currentLeaf;
+                branch.unshift(currentLeaf);
+
+                return true;
             }
 
-            return finder(currentLeaf.firstChild) || finder(currentLeaf.secondChild);
+            const isLeafFound = addLeafToBranch(currentLeaf.firstChild) || addLeafToBranch(currentLeaf.secondChild);
+
+            if (isLeafFound) {
+                branch.unshift(currentLeaf);
+            }
+
+            return isLeafFound;
         }
 
-        return finder(this.treeSource$.getValue());
+        addLeafToBranch(this.treeSource$.getValue());
+
+        return branch;
     }
 }

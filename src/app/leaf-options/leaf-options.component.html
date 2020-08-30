@@ -6,17 +6,18 @@
     <mat-icon>close</mat-icon>
 </button>
 
-<leaf-type-option [parentFormGroup]="formGroup">
+<leaf-type-option [formControl]="leafTypeControl">
 </leaf-type-option>
 
 <filter-type-option
     *ngIf="isFilterTypeOptionShown$ | async"
     [filters]="filters"
-    [parentFormGroup]="formGroup">
+    [formControl]="selectedFilterControl">
 </filter-type-option>
 
 <filter-value-option
     *ngIf="isFilterValueOptionShown$ | async"
     [selectedFilter]="selectedFilter$ | async"
-    [filters]="filters">
+    [filters]="filters"
+    [formControl]="filterValueControl">
 </filter-value-option>

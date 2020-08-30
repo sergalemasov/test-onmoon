@@ -1,1 +1,5 @@
-<leaf [leaf]="tree$ | async"></leaf>
+<leaf [leaf]="tree$ | async" [isRoot]="true"></leaf>
+
+<button mat-stroked-button class="save-btn" (click)="onSaveClick()">
+    Сохранить
+</button>

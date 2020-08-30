@@ -3,16 +3,18 @@
 </h4>
 
 <ng-container [formGroup]="formGroup">
-    <ng-container [ngSwitch]="selectedFilter.filterRepresentation">
+    <div [ngSwitch]="selectedFilter.filterRepresentation" class="inputs">
         <ng-container *ngSwitchCase="FilterRepresentation.CHECKBOX">
-            <mat-checkbox [formControlName]="controlNames.input">{{ selectedFilter.name }}</mat-checkbox>
+            <mat-checkbox [formControlName]="filterValueControlNames.input">{{ selectedFilter.name }}</mat-checkbox>
         </ng-container>
 
         <ng-container *ngSwitchCase="FilterRepresentation.RADIO_GROUP">
+            <ng-container *ngTemplateOutlet="notTemplate"></ng-container>
+
             <mat-radio-group
                 aria-label="Выберите один из вариантов"
                 class="radio-group"
-                [formControlName]="controlNames.input">
+                [formControlName]="filterValueControlNames.input">
                 <mat-radio-button
                     *ngFor="let option of selectedFilter.parameterValues[0]"
                     [value]="option"
@@ -23,22 +25,24 @@
         </ng-container>
 
         <ng-container *ngSwitchCase="FilterRepresentation.INPUT_WITH_OPERATOR">
+            <ng-container *ngTemplateOutlet="notTemplate"></ng-container>
             <ng-container *ngTemplateOutlet="operatorTemplate"></ng-container>
 
             <mat-form-field appearance="fill">
                 <mat-label>{{ selectedFilter.name }}</mat-label>
-                <input matInput [formControlName]="controlNames.input">
+                <input matInput [formControlName]="filterValueControlNames.input">
             </mat-form-field>
         </ng-container>
 
         <ng-container *ngSwitchCase="FilterRepresentation.AUTOCOMPLETE_WITH_OPERATOR">
+            <ng-container *ngTemplateOutlet="notTemplate"></ng-container>
             <ng-container *ngTemplateOutlet="operatorTemplate"></ng-container>
             <mat-form-field appearance="fill">
                 <mat-label>{{ selectedFilter.name }}</mat-label>
                 <input
                     type="text"
                     matInput
-                    [formControlName]="controlNames.input"
+                    [formControlName]="filterValueControlNames.input"
                     [matAutocomplete]="auto">
             </mat-form-field>
 
@@ -54,13 +58,17 @@
         <ng-template #operatorTemplate>
             <mat-form-field appearance="fill" class="operator">
                 <mat-label>Условие</mat-label>
-                <mat-select [formControlName]="controlNames.operator">
+                <mat-select [formControlName]="filterValueControlNames.operator">
                     <mat-option *ngFor="let operator of selectedFilter.operators" [value]="operator">
                         {{ operator | operatorPipe  }}
                     </mat-option>
                 </mat-select>
             </mat-form-field>
         </ng-template>
-    </ng-container>
+
+        <ng-template #notTemplate>
+            <mat-slide-toggle [formControlName]="filterValueControlNames.not" class="not">НЕ</mat-slide-toggle>
+        </ng-template>
+    </div>
 </ng-container>
 
